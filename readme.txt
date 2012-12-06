@@ -1,7 +1,7 @@
 === Jigoshop Smart Send Shipping ===
 Contributors: sp4cecat
 Donate link: http://codexmedia.com.au/donations
-Tags: e-commerce, shop, cart, ecommerce, shipping, tax, jigoshop, couriers, carriers, freight, postage, calculator
+Tags: e-commerce, shop, cart, ecommerce, shipping, tax, jigoshop, couriers, carriers, freight, postage, calculator, australia
 Requires at least: 3.4
 Tested up to: 3.4.2
 Stable tag: 3.8.9.3
