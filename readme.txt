@@ -24,7 +24,7 @@ For more information visit [http://codexmedia.com.au/jigoshop-smart-send-shippin
 
 == Support ==
 
-Support is available at the [Codex Media website](http://cocexmedia.com.au/support "Support"); 
+Support is available at the [Codex Media website](http://codexmedia.com.au/support "Support"); 
 
 == Changelog ==
 
@@ -36,7 +36,7 @@ First submission to plugin repository
 = Do I need a Smart Send VIP account to use shipping calculation? =
 
 Yes, the username and password are required to query the Smart Send SOAP API. To sign up, go to:
-[http://getshopped.org/resources/wp-consultants/](http://getshopped.org/resources/wp-consultants/ "http://getshopped.org/resources/wp-consultants/").
+[https://www.smartsend.com.au/vipClientEnquiry.cfm](https://www.smartsend.com.au/vipClientEnquiry.cfm "https://www.smartsend.com.au/vipClientEnquiry.cfm").
 
 = Do I need to set the 'shipping origin town' - isn't the postcode enough? =
 
