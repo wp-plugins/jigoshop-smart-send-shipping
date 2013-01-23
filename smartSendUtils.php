@@ -3,7 +3,6 @@
 class smartSendUtils
 {
 	private $ssWSDL = 'http://developer.smartsend.com.au/service.asmx?wsdl';
-	// const SSWSDL = 'http://smartsend-service.staging.emu.com.au/service.asmx?WSDL';
 
 	// TTL in days for locations cache
 	private $cacheTTL = 1;
@@ -43,7 +42,7 @@ class smartSendUtils
 	// Optional promo code
 	private $promoCode;
 
-	// Whether transport assurance required - default = 0
+	// Amount to insure
 	private $transportAssurance = 0;
 
 	// User type. Options are:
@@ -108,9 +107,9 @@ class smartSendUtils
 			'UserType' => $this->userType,
 			'OnlineSellerID' => $this->onlineSellerId,
 			'PromotionalCode' => $this->promotionalCode,			//string
-			'ReceiptedDelivery' => 'false',		//boolean
+			'ReceiptedDelivery' => $this->receiptedDelivery,		//boolean
 			'TailLift' => $this->tailLift,				//string NONE, PICKUP, DELIVERY, BOTH
-			'TransportAssurance' => 0,			//int
+			'TransportAssurance' => $this->transportAssurance,			//int
 			'Items' => $this->quoteItems
 		);
 
@@ -149,24 +148,21 @@ class smartSendUtils
 	{
 		$allowed = array(
 			'userType' => array( 'EBAY', 'PROMOTIONAL', 'VIP' ),
-			'onlineSellerId',
-			'promotionalCode',
+			'onlineSellerId' => '',
+			'promotionalCode' => '',
 			'receiptedDelivery' => array( 'true', 'false' ),
 			'tailLift' => array( 'NONE', 'PICKUP', 'DELIVERY', 'BOTH' ),
-			'transportAssurance'
+			'transportAssurance' => ''
 		);
 		if( !in_array( $param, array_keys( $allowed ) ) )
 		{
 			echo 'Not a settable parameter';
 			return;
 		} 
-		if( is_array( $allowed[$param] ) )
+		if( is_array( $allowed[$param] ) && !in_array( $value, $allowed[$param]) )
 		{
-			if( !in_array( $value, $allowed[$param]))
-			{
-				echo "'$value' is not a valid value for '$param'";
-				return;
-			}
+			echo "'$value' is not a valid value for '$param'";
+			return;
 		}
 		$this->$param = $value;
 	}
@@ -202,48 +198,69 @@ class smartSendUtils
 	 * @param bool $cached true (default) for returning cached data, false for fresh data
 	 * 
 	 */
-	public function getLocations( $cached = true )
+	public function getLocations( $cachedRequested = true )
 	{
-		$exists = true;
-		$expired = false;
-		if( !file_exists( $this->locationsCacheFile ) ) $exists = false;
-
-		// Check file age
-		if( $cached && $exists )
-		{
-			$fileAge = time() - filemtime( $this->locationsCacheFile );
-			if( $fileAge > ( $this->cacheTTL * 3600 ) )
-			{
-				$cached = false;
-				$expired = true;
-			}
-		}
-
-		if( $cached && $exists )
-		{
-			$this->locationList = unserialize(file_get_contents($this->locationsCacheFile));
-		}
+		if( !$cachedRequested )
+			return $this->_locationsToArray();
 		else
 		{
-			$locations = $this->soapClient->GetLocations();
-			foreach ($locations->GetLocationsResult->Location as $location)
+			$exists = ( file_exists( $this->locationsCacheFile ) ) ? true : false;
+			if( $exists )
 			{
-				$postcode = sprintf( "%04d", $location->Postcode );
-				$this->locationList[$postcode][] = array( $location->Suburb, $location->State );
+				// Return cached data if not expired
+				$fileAge = time() - filemtime( $this->locationsCacheFile );
+				if( $fileAge < $this->cacheTTL * 3600 )
+					$locationsList = unserialize(file_get_contents($this->locationsCacheFile));
 			}
-			// Only cache to file if cached version requested, in case we wish to cache some other way.
-			if( $cached && ( $expired || !$exists ) ) file_put_contents( $this->locationsCacheFile, serialize( $this->locationList ) );
+			// Either expired or doesn't exist
+			if( !isset( $locationsList ) )
+			{
+				$locationsList = $this->_locationsToArray();
+				file_put_contents( $this->locationsCacheFile, serialize( $locationsList ) );
+			}
+			return $locationsList;
+		}
+	}
+
+	// Request locations from SOAP object and convert to an array
+	// return: array $this->locationList
+	protected function _locationsToArray()
+	{
+		$locations = $this->soapClient->GetLocations();
+		foreach ($locations->GetLocationsResult->Location as $location)
+		{
+			$postcode = sprintf( "%04d", $location->Postcode );
+			$this->locationList[$postcode][] = array( $location->Suburb, $location->State );
 		}
 		return $this->locationList;
 	}
 
-	public function getState( $postcode, $town )
+	public function getState( $pcode )
 	{
-		$locations = ( $this->locationList ) ? $this->locationList : $this->getLocations();
+		$first = (int) $pcode[0]; 	// First number
+		$pcode = (int) $pcode;		// Type to integer
 
-		foreach( $locations[$postcode] as $data )
+		if( $first == 1 ) return 'NSW';
+
+		if( $first == 2 ) // ACT or NSW
 		{
-			if( strtoupper( $town ) == strtoupper( $data[0] ) ) return $data[1];
+			if( ( $pcode >= 2600 && $pcode <= 2618 ) || ( $pcode >= 2900 && $pcode <= 2920 ) ) return 'ACT';
+			return 'NSW'; // Defaults to..
 		}
+
+		if( $pcode < 300 ) return 'ACT';
+
+		if( $first == 3 || $first == 8 ) return 'VIC';
+
+		if( $first == 4 || $first == 9 ) return 'QLD';
+
+		if( $first == 5 ) return 'SA';
+
+		if( $first == 6 ) return 'WA';
+
+		if( $first == 7 ) return 'TAS';
+
+		// ACT's 0200-0299 already caught
+		if( $first == 0 ) return 'NT';
 	}
 }
