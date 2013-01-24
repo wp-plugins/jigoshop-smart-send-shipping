@@ -49,6 +49,10 @@ First submission to plugin repository
 
 == Upgrade Notice ==
 
+= 2.0.1 =
+
+Added option for selecting which package type your goods are sent in. Previously was defualt 'carton'
+
 = 2.0 =
 
 As well as code improvements - it now returns up to FOUR different quotes - this version offers options for receipted delivery, transport assurance and tail-lift delivery.
