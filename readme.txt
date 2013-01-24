@@ -4,7 +4,7 @@ Donate link: http://codexmedia.com.au/donations
 Tags: australia, calculator, carriers, cart, e-commerce, ecommerce, jigoshop, postage, shipping, shop, tax
 Requires at least: 3.4
 Tested up to: 3.5
-Stable tag: 2.0
+Stable tag: 2.0.1
 License: GPLv2
 
 The Jigoshop Smart Send shipping plugin integrates Australian shipping cost calculations for 'Smart Send' online shipping.
@@ -28,6 +28,11 @@ For more information visit [http://codexmedia.com.au/jigoshop-smart-send-shippin
 Support is available at the [Codex Media website](http://codexmedia.com.au/support "Support"); 
 
 == Changelog ==
+
+= 2.0.1 =
+
+- Added option for choosing package type
+- Tweak to utils package
 
 = 2.0 =
 Major update - added:

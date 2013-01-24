@@ -36,6 +36,7 @@ class jigoshop_smart_send extends jigoshop_shipping_method {
             add_action('jigoshop_update_options', array( &$this, 'process_admin_options') );
 
             add_option('jigoshop_smart_send_title', 'Courier');
+            add_option('jigoshop_smart_send_package_type', 'Carton');
             add_option('jigoshop_smart_send_handling_fee_type', 'none');
             add_option('jigoshop_smart_send_handling_fee', 0);
             add_option('jigoshop_smart_send_assurance', 'none');
@@ -276,6 +277,8 @@ class jigoshop_smart_send extends jigoshop_shipping_method {
         $vipUsername = get_option('jigoshop_smart_send_vipusername');
         $vipPassword = get_option('jigoshop_smart_send_vippassword');
 
+        $description = get_option('jigoshop_smart_send_package_type');
+
         if( sizeof( jigoshop_cart::$cart_contents ) > 0 && !empty($shippingOriginTown) && !empty($shippingOriginPostcode) )
         {
             $itemList = array();
@@ -327,11 +330,11 @@ class jigoshop_smart_send extends jigoshop_shipping_method {
                         if( $shipping_error ) continue;
 
                         $itemList[] = array(
-                            'Description' => 'Carton',
-                            'Weight' => $weight,
-                            'Depth' => $width,
-                            'Length' => $length,
-                            'Height' => $height
+                            'Description'   => $description,
+                            'Weight'        => $weight,
+                            'Depth'         => $width,
+                            'Length'        => $length,
+                            'Height'        => $height
                         );
                     } // End loop through item count
                 }
@@ -468,6 +471,22 @@ class jigoshop_smart_send extends jigoshop_shipping_method {
         </td>
     </tr>
     <tr>
+        <td class="titledesc"><a href="#" tabindex="99"></a><?php _e('Type of Package', 'jigoshop') ?>:</td>
+        <td class="forminp">
+            <select name="jigoshop_smart_send_package_type" id="jigoshop_smart_send_package_type">
+            <?php
+            $feeType = get_option('jigoshop_smart_send_package_type');
+            foreach( smartSendUtils::$ssPackageTypes as $v )
+            {
+                echo '<option value="'.$v.'"';
+                if( $v == $feeType ) echo ' selected="selected"';
+                echo ">$v</option>\n";
+            }
+            ?>
+            </select>
+        </td>
+    </tr>
+    <tr>
         <td class="titledesc"><a href="#" tip="<?php _e('Flat rate or a percentage of shipping cost.', 'jigoshop') ?>" class="tips" tabindex="99"></a><?php _e('Handling Fee Type', 'jigoshop') ?>:</td>
         <td class="forminp">
             <select name="jigoshop_smart_send_handling_fee_type" id="jigoshop_smart_send_handling_fee_type">
@@ -561,6 +580,8 @@ class jigoshop_smart_send extends jigoshop_shipping_method {
         if(isset($_POST['jigoshop_smart_send_vipusername'])) update_option('jigoshop_smart_send_vipusername', jigowatt_clean($_POST['jigoshop_smart_send_vipusername'])); else @delete_option('jigoshop_smart_send_vipusername');
 
         if(isset($_POST['jigoshop_smart_send_vippassword'])) update_option('jigoshop_smart_send_vippassword', jigowatt_clean($_POST['jigoshop_smart_send_vippassword'])); else @delete_option('jigoshop_smart_send_vippasswordd');
+
+        if(isset($_POST['jigoshop_smart_send_package_type'])) update_option('jigoshop_smart_send_package_type', jigowatt_clean($_POST['jigoshop_smart_send_package_type'])); else @delete_option('jigoshop_smart_send_package_type');
 
         if(isset($_POST['jigoshop_smart_send_title'])) update_option('jigoshop_smart_send_title', jigowatt_clean($_POST['jigoshop_smart_send_title'])); else @delete_option('jigoshop_smart_send_title');
 

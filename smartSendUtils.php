@@ -2,6 +2,21 @@
 
 class smartSendUtils
 {
+	public static $ssPackageTypes = array(
+		'Carton',
+		'Satchel/Bag',
+		'Tube',
+		'Skid',
+		'Pallet',
+		'Crate',
+		'Flat Pack',
+		'Roll',
+		'Length',
+		'Tyre/Wheel',
+		'Furniture/Bedding',
+		'Envelope'
+	);
+	
 	private $ssWSDL = 'http://developer.smartsend.com.au/service.asmx?wsdl';
 
 	// TTL in days for locations cache
